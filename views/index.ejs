@@ -1,0 +1,42 @@
+<%- include("layout/header") %>
+
+    <div class="container">
+        <div class="row">
+            <h1>Products List</h1>
+            <div class="table-responsive">
+                <% if (products != '') { %>
+                    <table class="table table-striped text-center mt-3 mb-3">
+                        <thead>
+                            <tr class="table-dark">
+                                <th>INDEX</th>
+                                <th>PRODUCT ID</th>
+                                <th>PRODUCT NAME</th>
+                                <th>CATEGORY ID</th>
+                                <th>CATEGORY NAME</th>
+                                <th>ACTION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% products.forEach((row, index) => { %>
+                                <tr class="align-middle">
+                                    <td><%= index %> </td>
+                                    <td><%= row._id %></td>
+                                    <td><%= row.productName %></td>
+                                    <td>2</td>
+                                    <td>Mobile</td>
+                                    <td>
+                                        <a href="/edit/<%= row._id %>" class="text-success">Edit</a>
+                                        <a href="/delete/<%= row._id %>" class="text-danger">Delete</a>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                    <% } else { %>
+                            <h1 class="text-center text-secondary mt-5">No Products Found!</h1>
+                        <% } %>
+            </div>
+        </div>
+    </div>
+
+    <%- include("layout/footer") %>
