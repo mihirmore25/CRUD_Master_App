@@ -51,7 +51,7 @@ router.post("/addProduct", async (req, res) => {
 });
 
 
-
+// Getting the add category page
 router.get("/products/:id/addCategory", (req, res) => {
     let id = req.params.id;
 
@@ -68,25 +68,29 @@ router.get("/products/:id/addCategory", (req, res) => {
     
 });
 
-// Product.findById(id, (err, product) => {
-//     if (err) {
-//         res.redirect("/");
-//     } else {
-//         if (product == null) {
-//             res.redirect("/");
-//         } else {
-//             res.render("add_category", {
-//                 title: "Add Category",
-//                 product: product
-//             });
-//         }
+// In This "home" route we will find all the products with 
+// their categories specifed for them.
+router.get("/home", async (req, res) => {
+    await await Product.find().populate(
+        {
+            path: "categories"
+        }
+    ).exec((err, products) => {
+        if (err) {
+            res.json({ message: err.message });
+        } else {
+            res.render("home", {
+                title: "All The Products with Categories",
+                products: products
+            });
+        }
 
-//     }
-
-// });
+    });
+});
 
 
 // Route for creating a new Category and updating Product "category" field with it
+// In this route we will find One to Many relation of product and their categories.
 router.post("/products/:id/addCategory", (req, res) => {
 
     const category = {
@@ -105,58 +109,6 @@ router.post("/products/:id/addCategory", (req, res) => {
             res.json(err);
         });  
 });
-
-
-router.get("/home", async (req, res) => {
-    await await Product.find().populate(
-        {
-            path: "categories"
-        }
-    ).exec((err, products) => {
-        if (err) {
-            res.json({ message: err.message });
-        } else {
-            res.render("home", {
-                title: "All The Products with Categories",
-                products: products
-            });
-        }
-
-    });
-})
-
-
-
-
-// Insert an Category into database route
-// router.post("/addCategory", (req, res) => {
-//     const category = new Category({
-//         categoryName: req.body.categoryName
-//     });
-
-//     category.save(err => {
-//         if (err) {
-//             res.json({
-//                 message: err.message, type: 'danger'
-//             });
-//         } else {
-//             req.session.message = {
-//                 type: "success",
-//                 message: "Category added successfully!"
-//             }
-            
-//             res.redirect("/categories");
-//         }
-//     });
-// });
-
-
-
-
-
-
-
-
 
 // Edit a Product Route
 router.get("/products/:id/edit", (req, res) => {
@@ -220,7 +172,45 @@ router.get("/products/:id/delete", (req, res) => {
     });
 });
 
-
-
-
 module.exports = router;
+
+// Insert an Category into database route
+// router.post("/addCategory", (req, res) => {
+//     const category = new Category({
+//         categoryName: req.body.categoryName
+//     });
+
+//     category.save(err => {
+//         if (err) {
+//             res.json({
+//                 message: err.message, type: 'danger'
+//             });
+//         } else {
+//             req.session.message = {
+//                 type: "success",
+//                 message: "Category added successfully!"
+//             }
+
+//             res.redirect("/categories");
+//         }
+//     });
+// });
+
+// Product.findById(id, (err, product) => {
+//     if (err) {
+//         res.redirect("/");
+//     } else {
+//         if (product == null) {
+//             res.redirect("/");
+//         } else {
+//             res.render("add_category", {
+//                 title: "Add Category",
+//                 product: product
+//             });
+//         }
+
+//     }
+
+// });
+
+
