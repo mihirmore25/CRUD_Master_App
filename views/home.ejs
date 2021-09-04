@@ -11,11 +11,13 @@
                                 <th>INDEX</th>
                                 <th>PRODUCT ID</th>
                                 <th>PRODUCT NAME</th>
+                                <th>CATEGORY ID</th>
+                                <th>CATEGORY NAME</th>
                                 <th>ACTION</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <% products.forEach((row, index)=> { %>
+                            <% products.forEach((row, index) => { %>
                                 <tr class="align-middle">
                                     <td>
                                         <%= index %>
@@ -26,13 +28,18 @@
                                     <td>
                                         <%= row.productName %>
                                     </td>
+                                    <% row.categories.forEach(category => { %>
+                                        <td><%= category._id %></td>
+                                        <td><%= category.categoryName %></td>
+                                    <% }) %>  
                                     <td>
-                                        <a href="/products/<%= row._id %>/addCategory" class="btn btn-primary">Add Category</a>
+                                        <a href="/products/<%= row._id %>/addCategory" class="btn btn-primary">Add
+                                            Category</a>
                                         <a href="/products/<%= row._id %>/edit" class="btn btn-success">Edit</a>
                                         <a href="/products/<%= row._id %>/delete" class="btn btn-danger">Delete</a>
                                     </td>
                                 </tr>
-                                <% }) %>
+                            <% }) %>
                         </tbody>
                     </table>
                     <% } else { %>
