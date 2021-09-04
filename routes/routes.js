@@ -172,6 +172,35 @@ router.get("/products/:id/delete", (req, res) => {
     });
 });
 
+
+// Adding pagination to the products route
+router.get('/products/:page', function (req, res, next) {
+    var perPage = 9
+    var page = req.params.page || 1
+
+    Product
+        .find()
+        .skip((perPage * page) - perPage)
+        .limit(perPage)
+        .populate("categories")
+        .exec(function (err, products) {
+            Product.countDocuments().exec(function (err, count) {
+                if (err) return next(err)
+                res.render("home", {
+                    title: "All The Products with Pagination",
+                    products: products,
+                });
+            });
+        });
+});
+
+
+
+
+
+
+
+
 module.exports = router;
 
 // Insert an Category into database route
