@@ -7,7 +7,11 @@
                     <div class="mb-3">
                         <label for="productName" class="form-label">Product</label>
                         <input type="text" name="productName" placeholder="Product Name" class="form-control mb-3">
-                        <input type="text" name="categoryName" placeholder="Category Name" class="form-control">
+                        <select class="form-select" aria-label="Default select example" name="categoryName">
+                            <option selected value="Mobile">Mobile</option>
+                            <option value="Laptop">Laptop</option>
+                            <option value="Computer">Computer</option>
+                        </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Add Product</button>
                     <a href="/products" class="btn btn-secondary">Cancel</a>
