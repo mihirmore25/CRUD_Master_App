@@ -6,7 +6,8 @@
                 <form action="/addProduct" method="POST">
                     <div class="mb-3">
                         <label for="productName" class="form-label">Product</label>
-                        <input type="text" name="productName" class="form-control">
+                        <input type="text" name="productName" placeholder="Product Name" class="form-control mb-3">
+                        <input type="text" name="categoryName" placeholder="Category Name" class="form-control">
                     </div>
                     <button type="submit" class="btn btn-primary">Add Product</button>
                     <a href="/products" class="btn btn-secondary">Cancel</a>

@@ -7,7 +7,7 @@ const Category = require("../models/category");
 router.get("/products", async (req, res) => {
     await Product.find().populate(
         {
-            path: "categories"
+            path: "category"
         }
     ).exec((err, products) => {
         if (err) {
@@ -22,58 +22,45 @@ router.get("/products", async (req, res) => {
     });
 });
 
+
 // Get the add product route
 router.get("/addProduct", (req, res) => {
     res.render("add_products", { title: "Add Products" });
 });
 
+
 // Insert an product into database route
 router.post("/addProduct", async (req, res) => {
-    const product = new Product({
-        productName: req.body.productName
+    const category = new Category({
+        categoryName: req.body.categoryName
     });
-    
-    product.save(err => {
-        if (err) {
-            res.json({
-                message: err.message, type: 'danger'
-            })
-        } else {
-            req.session.message = {
-                type: "success",
-                message: "Product added successfully!"
-            }
+
+    return category.save()
+        .then(category => {
+            console.log(category);
+
+            const categoryId = category._id;
+
+            const product = new Product({
+                productName: req.body.productName,
+                category: categoryId
+            });
+
+            product.save();
+
+            // return product;
 
             res.redirect("/products");
-        }
-    });
-    
+        });
 });
 
-
-// Getting the add category page
-router.get("/products/:id/addCategory", (req, res) => {
-    let id = req.params.id;
-
-    Product.findById(id).exec((err, product) => {
-        if (err) {
-            res.json({ message: err.message });
-        } else {
-            res.render("add_category", {
-                title: "Add Category",
-                product: product
-            });
-        }
-    });
-    
-});
 
 // In This "home" route we will find all the products with 
 // their categories specifed for them.
 router.get("/home", async (req, res) => {
-    await await Product.find().populate(
+    await Product.find().populate(
         {
-            path: "categories"
+            path: "category"
         }
     ).exec((err, products) => {
         if (err) {
@@ -89,26 +76,7 @@ router.get("/home", async (req, res) => {
 });
 
 
-// Route for creating a new Category and updating Product "category" field with it
-// In this route we will find One to Many relation of product and their categories.
-router.post("/products/:id/addCategory", (req, res) => {
 
-    const category = {
-        categoryName: req.body.categoryName
-    };
-
-    Category.create(category)
-        .then((category) => {
-            return Product.updateOne({ _id: req.params.id }, { $push: { categories: category._id } }, { new: true });
-        })
-        .then(products => {
-            // res.render("home", { title: "All The Products with Categories", products: products });
-            res.redirect("/home");
-        })
-        .catch(err => {
-            res.json(err);
-        });  
-});
 
 // Edit a Product Route
 router.get("/products/:id/edit", (req, res) => {
@@ -182,7 +150,7 @@ router.get('/products/:page', function (req, res, next) {
         .find()
         .skip((perPage * page) - perPage)
         .limit(perPage)
-        .populate("categories")
+        .populate("category")
         .exec(function (err, products) {
             Product.countDocuments().exec(function (err, count) {
                 if (err) return next(err)
@@ -195,51 +163,4 @@ router.get('/products/:page', function (req, res, next) {
 });
 
 
-
-
-
-
-
-
 module.exports = router;
-
-// Insert an Category into database route
-// router.post("/addCategory", (req, res) => {
-//     const category = new Category({
-//         categoryName: req.body.categoryName
-//     });
-
-//     category.save(err => {
-//         if (err) {
-//             res.json({
-//                 message: err.message, type: 'danger'
-//             });
-//         } else {
-//             req.session.message = {
-//                 type: "success",
-//                 message: "Category added successfully!"
-//             }
-
-//             res.redirect("/categories");
-//         }
-//     });
-// });
-
-// Product.findById(id, (err, product) => {
-//     if (err) {
-//         res.redirect("/");
-//     } else {
-//         if (product == null) {
-//             res.redirect("/");
-//         } else {
-//             res.render("add_category", {
-//                 title: "Add Category",
-//                 product: product
-//             });
-//         }
-
-//     }
-
-// });
-
-

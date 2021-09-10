@@ -28,13 +28,13 @@
                                     <td>
                                         <%= row.productName %>
                                     </td>
-                                    <% row.categories.forEach(category => { %>
-                                        <td><%= category._id %></td>
-                                        <td><%= category.categoryName %></td>
-                                    <% }) %>  
                                     <td>
-                                        <a href="/products/<%= row._id %>/addCategory" class="btn btn-primary">Add
-                                            Category</a>
+                                        <%= row.category._id %> 
+                                    </td> 
+                                    <td>
+                                        <%= row.category.categoryName %> 
+                                    </td> 
+                                    <td>
                                         <a href="/products/<%= row._id %>/edit" class="btn btn-success">Edit</a>
                                         <a href="/products/<%= row._id %>/delete" class="btn btn-danger">Delete</a>
                                     </td>
