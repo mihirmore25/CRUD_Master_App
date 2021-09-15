@@ -11,8 +11,7 @@
                                 <th>INDEX</th>
                                 <th>PRODUCT ID</th>
                                 <th>PRODUCT NAME</th>
-                                <th>CATEGORY ID</th>
-                                <th>CATEGORY NAME</th>
+
                                 <th>ACTION</th>
                             </tr>
                         </thead>
@@ -27,12 +26,6 @@
                                     </td>
                                     <td>
                                         <%= row.productName %>
-                                    </td>
-                                    <td>
-                                        <%= row.category._id %>
-                                    </td>
-                                    <td>
-                                        <%= row.category.categoryName %> 
                                     </td>
                                     <td>
                                         <a href="/products/<%= row._id %>/edit" class="btn btn-success">Edit</a>

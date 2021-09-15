@@ -13,7 +13,6 @@
                                 <th>PRODUCT NAME</th>
                                 <th>CATEGORY ID</th>
                                 <th>CATEGORY NAME</th>
-                                <th>ACTION</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -33,10 +32,6 @@
                                     </td> 
                                     <td>
                                         <%= row.category.categoryName %> 
-                                    </td> 
-                                    <td>
-                                        <a href="/products/<%= row._id %>/edit" class="btn btn-success">Edit</a>
-                                        <a href="/products/<%= row._id %>/delete" class="btn btn-danger">Delete</a>
                                     </td>
                                 </tr>
                             <% }) %>
