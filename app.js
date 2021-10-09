@@ -8,15 +8,19 @@ const PORT = process.env.PORT || 4000;
 
 // console.log(process.env.DB_URI);
 // Database connection
-mongoose.connect(process.env.DB_URI,
-    {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-        useFindAndModify: true
+(async () => {
+    const connection = await mongoose.connect(process.env.DB_URI,
+        {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            useFindAndModify: true
+        }
+    );
+
+    if (connection) {
+        console.log("Database is connected successfully...");
     }
-)
-    .then(() => console.log("Database is connected successfully..."))
-    .catch(err => console.log(err));
+})();
 
 // Middlewares
 app.use(express.urlencoded({ extended: false }));

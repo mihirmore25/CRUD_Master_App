@@ -5,33 +5,36 @@ const Category = require("../models/category");
 
 // Get All The products route
 router.get("/products", async (req, res) => {
-    await Product.find().exec((err, products) => {
-        if (err) {
-            res.json({ message: err.message });
-        } else {
+    try {
+        const products = await Product.find({});
+        if (products !== null) {
             res.render("productsIndex", {
                 title: "Products Page",
                 products: products
             });
         }
-
-    });
+    } catch (error) {
+        res.json({ error });
+    }
 });
+
 
 // Get All The categories route
 router.get("/categories", async (req, res) => {
-    await Category.find().exec((err, categories) => {
-        if (err) {
-            res.json({ message: err.message });
-        } else {
+    try {
+        const categories = await Category.find({});
+
+        if (categories !== null) {
             res.render("categoriesIndex", {
                 title: "Categories Page",
                 categories: categories
             });
         }
-
-    });
+    } catch (error) {
+        res.json({ error });
+    }
 });
+
 
 
 // Get the category route
@@ -41,271 +44,262 @@ router.get("/addCategory", (req, res) => {
 
 // Insert an category into database route
 router.post("/addCategory", async (req, res) => {
-    const category = new Category({
-        categoryName: req.body.categoryName
-    });
-
-    return category.save()
-        .then(category => {
-            console.log(category);
-            res.redirect("/categories");
+    try {
+        const newCategory = new Category({
+            categoryName: req.body.categoryName
         });
+        const category = await newCategory.save();
+        // console.log(category);
+        res.redirect("/categories");
+    } catch (error) {
+        res.json({ error });
+    }
 });
 
 
 // Get the add product route
-router.get("/categories/:id/addProduct", (req, res) => {
-    let id = req.params.id;
-
-    Category.findById(id).exec((err, category) => {
-        if (err) {
-            res.json({ message: err.message });
-        } else {
-            res.render("add_products", { title: "Add Product", category: category })
-        }
-    });
+router.get("/categories/:id/addProduct", async (req, res) => {
+    try {
+        let id = req.params.id;
+        const category = await Category.findById(id);
+        res.render("add_products", { title: "Add Product", category: category });
+    } catch (error) {
+        res.json({ error });
+    }
 });
 
 
 // Insert an product into database route
 router.post("/categories/:id/addProduct", async (req, res) => {
-    let id = req.params.id;
+    try {
+        let id = req.params.id;
 
-    await Category.findById(id).exec((err, category) => {
-        if (err) {
-            res.json({ message: err.message });
-        }
+        const category = await Category.findById(id);
+        // console.log(category);
 
-        console.log(category);
         const product = new Product({
             productName: req.body.productName,
             category: category._id
         });
 
-        product.save();
-
+        await product.save();
         res.redirect("/home");
-    });
+
+    } catch (error) {
+        res.json({ error });
+    }
 });
 
 
 // In This "home" route we will find all the products with 
 // their categories specifed for them.
 router.get("/home", async (req, res) => {
-    await Product.find().populate(
-        {
-            path: "category"
-        }
-    ).exec((err, products) => {
-        if (err) {
-            res.json({ message: err.message });
-        } else {
-            res.render("home", {
-                title: "All The Products with Categories",
-                products: products
-            });
-        }
-
-    });
+    try {
+        const products = await Product.find().populate(
+            {
+                path: "category"
+            }
+        );
+        res.render("home", {
+            title: "All The Products with Categories",
+            products: products
+        });
+    } catch (error) {
+        res.json({ error });
+    }
 });
 
 
 
 
 // Edit a Product Route
-router.get("/products/:id/edit", (req, res) => {
-    let id = req.params.id;
-    Product.findById(id, (err, product) => {
-        if (err) {
+router.get("/products/:id/edit", async (req, res) => {
+    try {
+        let id = req.params.id;
+        const product = await Product.findById(id);
+
+        if (product === null) {
             res.redirect("/");
         } else {
-            if (product == null) {
-                res.redirect("/");
-            } else {
-                res.render("edit_product", {
-                    title: "Edit Product",
-                    product: product
-                });
-            }
-
+            res.render("edit_product", {
+                title: "Edit Product",
+                product: product
+            });
         }
 
-    });
+    } catch (error) {
+        res.json({ error });
+    }
 });
 
 // Update a product route
-router.post("/updateProduct/:id", (req, res) => {
-    let id = req.params.id;
+router.post("/updateProduct/:id", async (req, res) => {
+    try {
+        let id = req.params.id;
 
-    Product.updateOne({ _id: id }, {
-        productName: req.body.productName
-    }, (err, result) => {
-        if (err) {
-            res.json({
-                message: err.message, type: 'danger'
-            });
-        } else {
-            req.session.message = {
-                type: "success",
-                message: "Product updated successfully!"
-            };
+        const result = await Product.updateOne({ _id: id }, {
+            $set: { productName: req.body.productName }
+        });
 
-            res.redirect("/products");
-        }
-    })
+        req.session.message = {
+            type: "success",
+            message: "Product updated successfully!"
+        };
+        res.redirect("/products");
+
+    } catch (error) {
+        res.json({ error });
+    }
 });
 
 
-
-
-
 // Delete product route
-router.get("/products/:id/delete", (req, res) => {
-    let id = req.params.id;
+router.get("/products/:id/delete", async (req, res) => {
 
-    Product.deleteOne({ _id: id }, (err, result) => {
-        if (err) {
-            res.json({ message: err.message });
-        } else {
-            req.session.message = {
-                type: "info",
-                message: "Product deleted successfully!"
-            }
+    try {
+        let id = req.params.id;
 
-            res.redirect("/products");
+        const result = await Product.deleteOne({ _id: id });
+        req.session.message = {
+            type: "info",
+            message: "Product deleted successfully!"
         }
-    });
+
+        res.redirect("/products");
+    }
+    catch (error) {
+        res.json({ error });
+    }
 });
 
 
 // Edit a Category Route
-router.get("/categories/:id/edit", (req, res) => {
-    let id = req.params.id;
-    Category.findById(id, (err, category) => {
-        if (err) {
+router.get("/categories/:id/edit", async (req, res) => {
+    try {
+        let id = req.params.id;
+        const category = await Category.findById(id);
+        if (category === null) {
             res.redirect("/");
         } else {
-            if (category == null) {
-                res.redirect("/");
-            } else {
-                res.render("edit_category", {
-                    title: "Edit Category",
-                    category: category
-                });
-            }
-
+            res.render("edit_category", {
+                title: "Edit Category",
+                category: category
+            });
         }
 
-    });
+    } catch (error) {
+        res.json({ error });
+    }
 });
 
 // Update a Category route
-router.post("/updateCategory/:id", (req, res) => {
-    let id = req.params.id;
-
-    Category.updateOne({ _id: id }, {
-        categoryName: req.body.categoryName
-    }, (err, result) => {
-        if (err) {
-            res.json({
-                message: err.message, type: 'danger'
-            });
-        } else {
-            req.session.message = {
-                type: "success",
-                message: "Category updated successfully!"
-            };
-
-            res.redirect("/categories");
-        }
-    })
+router.post("/updateCategory/:id", async (req, res) => {
+    try {
+        let id = req.params.id;
+        const result = await Category.updateOne({ _id: id }, {
+            $set: {
+                categoryName: req.body.categoryName
+            }
+        });
+        req.session.message = {
+            type: "success",
+            message: "Category updated successfully!"
+        };
+        res.redirect("/categories");
+    } catch (error) {
+        res.json({ error });
+    }
 });
 
 
-
-
-
 // Delete category route
-router.get("/categories/:id/delete", (req, res) => {
-    let id = req.params.id;
+router.get("/categories/:id/delete", async (req, res) => {
+    try {
+        let id = req.params.id;
+        const result = Category.deleteOne({ _id: id }, (err, result) => {
+            if (err) {
+                res.json({ message: err.message });
+            } else {
+                req.session.message = {
+                    type: "info",
+                    message: "Category deleted successfully!"
+                }
 
-    Category.deleteOne({ _id: id }, (err, result) => {
-        if (err) {
-            res.json({ message: err.message });
-        } else {
-            req.session.message = {
-                type: "info",
-                message: "Category deleted successfully!"
+                res.redirect("/categories");
             }
-
-            res.redirect("/categories");
-        }
-    });
+        });
+    } catch (error) {
+        res.json({ error });
+    }
 });
 
 
 
 // Adding pagination to the home route 
 // where all the products and categories will be
-router.get('/home/:page', function (req, res, next) {
+router.get('/home/:page', async (req, res, next) => {
     var perPage = 9
     var page = req.params.page || 1
 
-    Product
+    const products = await Product
         .find()
         .skip((perPage * page) - perPage)
         .limit(perPage)
-        .populate("category")
-        .exec(function (err, products) {
-            Product.countDocuments().exec(function (err, count) {
-                if (err) return next(err)
-                res.render("home", {
-                    title: "All The Products with Pagination On Home Page",
-                    products: products,
-                });
-            });
-        });
+        .populate("category");
+
+    const count = await Product.countDocuments();
+
+    res.render("home", {
+        title: "All The Products with Pagination On Home Page",
+        products: products,
+    });
 });
 
-// Adding pagination to the products route
-router.get('/products/:page', function (req, res, next) {
-    var perPage = 9
-    var page = req.params.page || 1
 
-    Product
-        .find()
-        .skip((perPage * page) - perPage)
-        .limit(perPage)
-        .exec(function (err, products) {
-            Product.countDocuments().exec(function (err, count) {
-                if (err) return next(err)
-                res.render("productsIndex", {
-                    title: "All The Products with Pagination",
-                    products: products,
-                });
-            });
+// Adding pagination to the products route
+router.get('/products/:page', async (req, res, next) => {
+    try {
+        var perPage = 9
+        var page = req.params.page || 1
+    
+        const products = await Product
+            .find()
+            .skip((perPage * page) - perPage)
+            .limit(perPage)
+            .populate("category");
+    
+        const count = await Product.countDocuments();
+    
+        res.render("home", {
+            title: "All The Products with Pagination On Products Page",
+            products: products,
         });
+    } catch (error) {
+        res.json({ error });
+    }
 });
 
 
 // Adding pagination to the categories route
-router.get('/categories/:page', function (req, res, next) {
-    var perPage = 9
-    var page = req.params.page || 1
-
-    Category
-        .find()
-        .skip((perPage * page) - perPage)
-        .limit(perPage)
-        .exec(function (err, categories) {
-            Category.countDocuments().exec(function (err, count) {
-                if (err) return next(err)
-                res.render("categoriesIndex", {
-                    title: "All The Categories with Pagination",
-                    categories: categories,
-                });
-            });
+router.get('/categories/:page', async (req, res, next) => {
+    try {
+        var perPage = 9
+        var page = req.params.page || 1
+    
+        const categories = await Category
+            .find()
+            .skip((perPage * page) - perPage)
+            .limit(perPage);
+    
+        const count = await Category.countDocuments();
+    
+        res.render("categoriesIndex", {
+            title: "All The Categories with Pagination",
+            categories: categories,
         });
+    } catch (error) {
+        res.json({ error });
+    }
 });
 
 
